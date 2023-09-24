@@ -91,7 +91,7 @@ namespace Api.Services
         
         private async Task<User> GetUserByCredention(string login, string pass)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email.ToLower() == login.ToLower());
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Name.ToLower() == login.ToLower());
             if (user == null)
                 throw new Exception("user not found");
 
