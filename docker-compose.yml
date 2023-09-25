@@ -1,0 +1,21 @@
+version: '3.4'
+
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=34ihinah
+    ports:
+      - '5432:5432'
+  
+  api:
+    image: ${DOCKER_REGISTRY-}api
+    build:
+      context: .
+      dockerfile: Api/Dockerfile
+    ports:
+      - '8080:80'
+    depends_on:
+      - db

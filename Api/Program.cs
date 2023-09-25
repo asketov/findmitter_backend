@@ -34,7 +34,7 @@ internal class Program
         {
             c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
             {
-                Description = "Введите токен пользователя",
+                Description = "Р’РІРµРґРёС‚Рµ С‚РѕРєРµРЅ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ",
                 Name = "Authorization",
                 In = ParameterLocation.Header,
                 Type = SecuritySchemeType.ApiKey,
@@ -85,7 +85,6 @@ internal class Program
         builder.Services.AddScoped<AuthService>();
         builder.Services.AddScoped<PostService>();
         builder.Services.AddScoped<LinkGeneratorService>();
-        //builder.Services.AddSingleton<DdosGuard>();
 
         builder.Services.AddAuthentication(o =>
         {

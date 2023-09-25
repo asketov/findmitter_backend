@@ -12,15 +12,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221108081413_AttachesWithavatars")]
-    partial class AttachesWithavatars
+    [Migration("20230924130916_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.0-rc.2.22472.11")
+                .HasAnnotation("ProductVersion", "7.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -58,6 +58,28 @@ namespace Api.Migrations
                     b.UseTptMappingStrategy();
                 });
 
+            modelBuilder.Entity("DAL.Entities.Post", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.ToTable("Posts");
+                });
+
             modelBuilder.Entity("DAL.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -77,6 +99,9 @@ namespace Api.Migrations
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PushToken")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -128,10 +153,33 @@ namespace Api.Migrations
                     b.ToTable("Avatars", (string)null);
                 });
 
+            modelBuilder.Entity("DAL.Entities.PostContent", b =>
+                {
+                    b.HasBaseType("DAL.Entities.Attach");
+
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uuid");
+
+                    b.HasIndex("PostId");
+
+                    b.ToTable("PostContent", (string)null);
+                });
+
             modelBuilder.Entity("DAL.Entities.Attach", b =>
                 {
                     b.HasOne("DAL.Entities.User", "Author")
                         .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+                });
+
+            modelBuilder.Entity("DAL.Entities.Post", b =>
+                {
+                    b.HasOne("DAL.Entities.User", "Author")
+                        .WithMany("Posts")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -167,9 +215,33 @@ namespace Api.Migrations
                     b.Navigation("Owner");
                 });
 
+            modelBuilder.Entity("DAL.Entities.PostContent", b =>
+                {
+                    b.HasOne("DAL.Entities.Attach", null)
+                        .WithOne()
+                        .HasForeignKey("DAL.Entities.PostContent", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DAL.Entities.Post", "Post")
+                        .WithMany("PostContents")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+                });
+
+            modelBuilder.Entity("DAL.Entities.Post", b =>
+                {
+                    b.Navigation("PostContents");
+                });
+
             modelBuilder.Entity("DAL.Entities.User", b =>
                 {
                     b.Navigation("Avatar");
+
+                    b.Navigation("Posts");
 
                     b.Navigation("Sessions");
                 });
